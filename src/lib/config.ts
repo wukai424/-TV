@@ -196,6 +196,18 @@ async function getInitConfig(configFile: string, subConfig: {
     cfgFile = JSON.parse(configFile) as ConfigFileStruct;
   } catch (e) {
     cfgFile = {} as ConfigFileStruct;
+    // Default: try to fetch from lunatv-config if ConfigFile is empty
+    try {
+      const defaultUrl = 'https://raw.githubusercontent.com/fmynj/lunatv-config/main/LunaTV-config.json';
+      const resp = await fetch(defaultUrl);
+      if (resp.ok) {
+        const remoteCfg = await resp.json();
+        cfgFile = { ...cfgFile, ...remoteCfg };
+        console.log('Loaded default config from:', defaultUrl);
+      }
+    } catch (e) {
+      console.warn('Failed to load default config:', e);
+    }
   }
   const adminConfig: AdminConfig = {
     ConfigFile: configFile,
