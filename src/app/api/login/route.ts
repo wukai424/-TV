@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
       // 验证成功，设置认证cookie
       const response = NextResponse.json({ ok: true });
       const cookieValue = await generateAuthCookie(
-        undefined,
+        'local-user',
         password,
         'user',
         true
