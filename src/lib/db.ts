@@ -13,7 +13,7 @@ const STORAGE_TYPE =
     | 'redis'
     | 'upstash'
     | 'kvrocks'
-    | undefined) || 'localstorage';
+    | undefined) || 'upstash';
 
 // 创建存储实例
 function createStorage(): IStorage {
