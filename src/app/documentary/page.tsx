@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any,react-hooks/exhaustive-deps */
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Film, Tv } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
+import PageLayout from '@/components/PageLayout';
 
 interface DoubanItem {
   id: string;
@@ -15,7 +15,6 @@ interface DoubanItem {
   year: string;
 }
 
-// 纪录片主题分类
 const THEMES = [
   { key: '纪录片', label: '全部' },
   { key: '自然', label: '自然' },
@@ -43,8 +42,6 @@ function DocumentaryPageClient() {
   useEffect(() => {
     setLoading(true);
     setItems([]);
-
-    // 同时请求电影和剧集两边的纪录片
     Promise.all([
       fetch(`/api/douban?type=movie&tag=${encodeURIComponent(theme)}&pageSize=50`).then(r => r.json()),
       fetch(`/api/douban?type=tv&tag=${encodeURIComponent(theme)}&pageSize=50`).then(r => r.json()),
@@ -61,7 +58,6 @@ function DocumentaryPageClient() {
     });
   }, [theme]);
 
-  // 按评分排序
   const sorted = [...items].sort((a, b) => {
     if (sortBy === 'rate') {
       return parseFloat(b.rate || '0') - parseFloat(a.rate || '0');
@@ -70,13 +66,12 @@ function DocumentaryPageClient() {
   });
 
   return (
-    <div className="w-full min-h-screen bg-white dark:bg-black">
+    <PageLayout activePath="/documentary">
       <div className="max-w-7xl mx-auto px-4 py-6">
         <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
-          📺 纪录片精选
+          纪录片精选
         </h1>
 
-        {/* 主题筛选 */}
         <div className="flex flex-wrap gap-2 mb-4">
           {THEMES.map((t) => {
             const isActive = theme === t.key;
@@ -97,7 +92,6 @@ function DocumentaryPageClient() {
           })}
         </div>
 
-        {/* 排序 */}
         <div className="flex items-center gap-2 mb-4">
           <span className="text-sm text-gray-500">排序：</span>
           <button
@@ -117,21 +111,16 @@ function DocumentaryPageClient() {
             年份 ↓
           </button>
           {!loading && (
-            <span className="text-sm text-gray-400 ml-2">
-              共 {items.length} 部
-            </span>
+            <span className="text-sm text-gray-400 ml-2">共 {items.length} 部</span>
           )}
         </div>
 
-        {/* 内容区 */}
         {loading ? (
           <div className="flex justify-center py-20">
             <div className="animate-spin h-8 w-8 border-4 border-green-500 border-t-transparent rounded-full" />
           </div>
         ) : sorted.length === 0 ? (
-          <div className="text-center py-20 text-gray-400">
-            暂无该主题的纪录片数据
-          </div>
+          <div className="text-center py-20 text-gray-400">暂无该主题的纪录片数据</div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {sorted.map((item) => (
@@ -149,9 +138,7 @@ function DocumentaryPageClient() {
                       loading="lazy"
                     />
                   ) : (
-                    <div className="flex items-center justify-center h-full text-gray-400">
-                      暂无封面
-                    </div>
+                    <div className="flex items-center justify-center h-full text-gray-400">暂无封面</div>
                   )}
                   {item.rate && parseFloat(item.rate) > 0 && (
                     <div className="absolute top-2 right-2 bg-yellow-500 text-white text-xs font-bold px-1.5 py-0.5 rounded">
@@ -160,19 +147,15 @@ function DocumentaryPageClient() {
                   )}
                 </div>
                 <div className="p-2">
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                    {item.title}
-                  </p>
-                  {item.year && (
-                    <p className="text-xs text-gray-400 mt-0.5">{item.year}</p>
-                  )}
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{item.title}</p>
+                  {item.year && <p className="text-xs text-gray-400 mt-0.5">{item.year}</p>}
                 </div>
               </Link>
             ))}
           </div>
         )}
       </div>
-    </div>
+    </PageLayout>
   );
 }
 
