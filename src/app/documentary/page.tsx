@@ -7,6 +7,12 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import PageLayout from '@/components/PageLayout';
 
+// 豆瓣图片转成可访问的代理地址
+const proxyDoubanImage = (url: string) => {
+  if (!url) return '';
+  // 替换豆瓣原图地址为代理地址
+  return url.replace(/img[\d]\.doubanio\.com/, 'doubanimg.com');
+};
 interface DoubanItem {
   id: string;
   title: string;
@@ -132,7 +138,7 @@ function DocumentaryPageClient() {
                 <div className="aspect-[2/3] relative overflow-hidden bg-gray-200 dark:bg-gray-800">
                   {item.poster ? (
                     <img
-                      src={item.poster}
+                      src={proxyDoubanImage(item.poster)}
                       alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                       loading="lazy"
