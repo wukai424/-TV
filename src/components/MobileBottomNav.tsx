@@ -27,6 +27,10 @@ const MobileBottomNav = ({ activePath }: MobileBottomNavProps) => {
       label: '电影',
       href: '/douban?type=movie',
     },
+    { icon: Star,
+     label: '纪录片',
+     href: '/documentary'
+    },
     {
       icon: Tv,
       label: '剧集',
