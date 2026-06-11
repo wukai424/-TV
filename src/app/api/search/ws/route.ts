@@ -9,7 +9,10 @@ import { yellowWords } from '@/lib/yellow';
 
 export const runtime = 'nodejs';
 
-export async function GET(request: NextRequest) 
+export async function GET(request: NextRequest) {
+  const authInfo = getAuthInfoFromCookie(request);
+  const username = authInfo?.username || 'local-user';
+  }
 
   const { searchParams } = new URL(request.url);
   const query = searchParams.get('q');
@@ -27,7 +30,7 @@ export async function GET(request: NextRequest)
   }
 
   const config = await getConfig();
-  const apiSites = await getAvailableApiSites(authInfo.username);
+  const apiSites = await getAvailableApiSites(username);
 
   // 共享状态
   let streamClosed = false;
