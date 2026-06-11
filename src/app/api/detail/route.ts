@@ -6,11 +6,7 @@ import { getDetailFromApi } from '@/lib/downstream';
 
 export const runtime = 'nodejs';
 
-export async function GET(request: NextRequest) {
-  const authInfo = getAuthInfoFromCookie(request);
-  if (!authInfo || !authInfo.username) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+export async function GET(request: NextRequest) 
 
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
