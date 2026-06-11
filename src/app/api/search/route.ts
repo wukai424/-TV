@@ -9,7 +9,11 @@ import { yellowWords } from '@/lib/yellow';
 
 export const runtime = 'nodejs';
 
-export async function GET(request: NextRequest) 
+export async function GET(request: NextRequest) {
+  const authInfo = getAuthInfoFromCookie(request);
+  // 兼容第三方 App（Selene/TVBox）无 cookie 调用
+  const username = authInfo?.username || 'local-user';
+  }
 
   const { searchParams } = new URL(request.url);
   const query = searchParams.get('q');
@@ -30,7 +34,7 @@ export async function GET(request: NextRequest)
   }
 
   const config = await getConfig();
-  const apiSites = await getAvailableApiSites(authInfo.username);
+  const apiSites = await getAvailableApiSites(username);
 
   // 添加超时控制和错误处理，避免慢接口拖累整体响应
   const searchPromises = apiSites.map((site) =>
