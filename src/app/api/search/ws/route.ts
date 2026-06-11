@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
         if (completedSources === apiSites.length && !streamClosed) {
           const completeEvent = `data: ${JSON.stringify({ type: 'complete', totalResults: allResults.length, completedSources, timestamp: Date.now() })}\n\n`;
           if (safeEnqueue(encoder.encode(completeEvent))) {
-            try { controller.close(); } catch {}
+            try { controller.close(); } catch { /* stream may already be closed */ }
           }
         }
       });
