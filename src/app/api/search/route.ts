@@ -11,9 +11,7 @@ export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
   const authInfo = getAuthInfoFromCookie(request);
-  // 兼容第三方 App（Selene/TVBox）无 cookie 调用
   const username = authInfo?.username || 'local-user';
-  }
 
   const { searchParams } = new URL(request.url);
   const query = searchParams.get('q');
@@ -22,21 +20,13 @@ export async function GET(request: NextRequest) {
     const cacheTime = await getCacheTime();
     return NextResponse.json(
       { results: [] },
-      {
-        headers: {
-          'Cache-Control': `public, max-age=${cacheTime}, s-maxage=${cacheTime}`,
-          'CDN-Cache-Control': `public, s-maxage=${cacheTime}`,
-          'Vercel-CDN-Cache-Control': `public, s-maxage=${cacheTime}`,
-          'Netlify-Vary': 'query',
-        },
-      }
+      { headers: { 'Cache-Control': `public, max-age=${cacheTime}, s-maxage=${cacheTime}` } }
     );
   }
 
   const config = await getConfig();
   const apiSites = await getAvailableApiSites(username);
 
-  // 添加超时控制和错误处理，避免慢接口拖累整体响应
   const searchPromises = apiSites.map((site) =>
     Promise.race([
       searchFromApi(site, query),
@@ -45,7 +35,7 @@ export async function GET(request: NextRequest) {
       ),
     ]).catch((err) => {
       console.warn(`搜索失败 ${site.name}:`, err.message);
-      return []; // 返回空数组而不是抛出错误
+      return [];
     })
   );
 
@@ -64,7 +54,6 @@ export async function GET(request: NextRequest) {
     const cacheTime = await getCacheTime();
 
     if (flattenedResults.length === 0) {
-      // no cache if empty
       return NextResponse.json({ results: [] }, { status: 200 });
     }
 
@@ -73,9 +62,6 @@ export async function GET(request: NextRequest) {
       {
         headers: {
           'Cache-Control': `public, max-age=${cacheTime}, s-maxage=${cacheTime}`,
-          'CDN-Cache-Control': `public, s-maxage=${cacheTime}`,
-          'Vercel-CDN-Cache-Control': `public, s-maxage=${cacheTime}`,
-          'Netlify-Vary': 'query',
         },
       }
     );
